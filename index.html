@@ -128,7 +128,14 @@ table{width:100%;border-collapse:collapse}
 .sk input[type=checkbox]{width:15px;height:15px;accent-color:var(--ember);cursor:pointer}
 .sk .om input{width:26px;text-align:center;background:var(--raised);border:1px solid var(--line);border-radius:5px;padding:1px 0;font-size:.72rem}
 .sk .om select{width:auto;font-size:.64rem;color:var(--faint);background:var(--raised);border:1px solid var(--line);border-radius:5px;padding:1px 2px}
+.sk .nm .arm{color:var(--muted);font-size:.7rem;cursor:help}
 .sk.tr{background:color-mix(in srgb,var(--ember-soft) 40%,transparent)}
+.stepper{display:flex;align-items:center;gap:5px;justify-content:center;margin-top:2px}
+.stepper button{width:28px;height:32px;border:1px solid var(--line);background:var(--raised);color:var(--ink);border-radius:8px;font-size:1.15rem;line-height:1;cursor:pointer;flex:0 0 auto;font-weight:700}
+.stepper button:hover{border-color:var(--ember);color:var(--ember)}
+.stepper input{flex:1;min-width:0}
+.armnote{font-size:.72rem;color:var(--muted);margin-top:8px}
+.armnote b{color:var(--ink)}
 .equip{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .eqcol .row{display:grid;grid-template-columns:1fr 46px;gap:6px;border-bottom:1px solid var(--line);padding:2px 2px}
 .eqcol .row input{font-size:.84rem;padding:4px 2px}
@@ -207,19 +214,18 @@ table{width:100%;border-collapse:collapse}
     <div class="vitals">
       <div class="box center"><span class="lbl">Pontos de Vida</span><div class="pair">
         <div class="p"><span class="vlbl">Máx</span><input data-f="pvmax" class="tnum"></div>
-        <div class="p"><span class="vlbl">Atuais</span><input data-f="pvatual" class="tnum"></div></div></div>
+        <div class="p"><span class="vlbl">Atuais</span><div class="stepper"><button type="button" data-step="pvatual" data-d="-1" aria-label="perder PV">−</button><input data-f="pvatual" class="tnum"><button type="button" data-step="pvatual" data-d="1" aria-label="ganhar PV">+</button></div></div></div></div>
       <div class="box center"><span class="lbl">Pontos de Mana</span><div class="pair">
         <div class="p"><span class="vlbl">Máx</span><input data-f="pmmax" class="tnum"></div>
-        <div class="p"><span class="vlbl">Atuais</span><input data-f="pmatual" class="tnum"></div></div></div>
+        <div class="p"><span class="vlbl">Atuais</span><div class="stepper"><button type="button" data-step="pmatual" data-d="-1" aria-label="gastar PM">−</button><input data-f="pmatual" class="tnum"><button type="button" data-step="pmatual" data-d="1" aria-label="recuperar PM">+</button></div></div></div></div>
     </div>
     <div class="box center"><span class="lbl">Defesa</span>
       <div class="bignum tnum" id="defTotal">10</div>
       <div class="defbreak">
         <span>10</span><span class="op">+</span>
         <span><b id="defDes" class="tnum">0</b> Des</span><span class="op">+</span>
-        <input data-f="defArm" class="tnum" value="0" title="Armadura"><span style="font-size:.6rem">arm</span><span class="op">+</span>
-        <input data-f="defEsc" class="tnum" value="0" title="Escudo"><span style="font-size:.6rem">esc</span><span class="op">+</span>
-        <input data-f="defOut" class="tnum" value="0" title="Outros"><span style="font-size:.6rem">out</span>
+        <span title="Armadura + Escudo (vem da tabela abaixo)"><b id="defArmEsc" class="tnum">0</b> arm/esc</span><span class="op">+</span>
+        <input data-f="defOut" class="tnum" value="0" title="Outros (racial, mágico, natural...)"><span style="font-size:.6rem">out</span>
       </div>
     </div>
     <div class="box prof">
@@ -245,17 +251,18 @@ table{width:100%;border-collapse:collapse}
   <div class="sec"><h2 class="sec-t">Perícias</h2>
     <div class="card" style="padding:10px 14px">
       <div style="font-size:.6rem;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;display:flex;justify-content:space-between;padding:0 4px 6px">
-        <span>✔ treinada · <span style="color:var(--gold);font-weight:700">G</span> só treinada</span><span>total = ½ nível + atributo + treino + outros</span></div>
+        <span>✔ treinada · <span style="color:var(--gold);font-weight:700">G</span> só treinada · ⛨ penalidade de armadura</span><span>total = ½ nível + atributo + treino + outros</span></div>
       <div class="skills" id="skills"></div>
     </div>
   </div>
 
   <div class="sec"><div class="equip">
     <div class="box"><h2 class="sec-t" style="color:var(--ember)">Armadura &amp; Escudo</h2>
-      <div class="tbl"><table><thead><tr><th>Item</th><th class="c">Penal.</th></tr></thead><tbody>
-        <tr><td><input data-f="armaduraNome" placeholder="Armadura"></td><td class="c"><input data-f="armaduraPen" class="tnum"></td></tr>
-        <tr><td><input data-f="escudoNome" placeholder="Escudo"></td><td class="c"><input data-f="escudoPen" class="tnum"></td></tr>
+      <div class="tbl"><table><thead><tr><th>Item</th><th class="c">Defesa</th><th class="c">Penal.</th></tr></thead><tbody>
+        <tr><td><input data-f="armaduraNome" placeholder="Armadura"></td><td class="c"><input data-f="armaduraDef" class="tnum"></td><td class="c"><input data-f="armaduraPen" class="tnum"></td></tr>
+        <tr><td><input data-f="escudoNome" placeholder="Escudo"></td><td class="c"><input data-f="escudoDef" class="tnum"></td><td class="c"><input data-f="escudoPen" class="tnum"></td></tr>
       </tbody></table></div>
+      <div class="armnote">Penalidade de armadura: <b id="penTotal" class="tnum">0</b> <span style="color:var(--faint)">— aplicada automaticamente em Acrobacia, Furtividade e Ladinagem.</span></div>
     </div>
     <div class="box"><h2 class="sec-t" style="color:var(--ember)">Carga</h2>
       <div class="money" style="margin-top:0">
@@ -318,9 +325,12 @@ const SK=[
  ["Religião","SAB",1,"reli","Reli"],["Sobrevivência","SAB",0,"sobre","Sobr"],["Vontade","SAB",0,"vonta","Vont"],
 ];
 const skId=nm=>nm.replace(/[^A-Za-z0-9]/g,'');
+const ARMOR_SKILLS=new Set(["Acrobacia","Furtividade","Ladinagem"]); // sofrem penalidade de armadura (T20)
+function armorDef(){return num($('[data-f="armaduraDef"]')?.value)+num($('[data-f="escudoDef"]')?.value);}
+function armorPen(){return -(Math.abs(num($('[data-f="armaduraPen"]')?.value))+Math.abs(num($('[data-f="escudoPen"]')?.value)));} // sempre reduz (aceita 1 ou -1)
 
 /* ---------- estado ---------- */
-const KEY="pontecinza-gerador-v1";
+const KEY="pontecinza-gerador-v2";
 let attrs={FOR:10,DES:10,CON:10,INT:10,SAB:10,CAR:10};
 let level=1;
 let skillState={};   // id -> {trained,attr,outros}
@@ -362,9 +372,10 @@ function renderSkills(){
     const [display,defAttr,g]=s; const id=skId(display); const st=skillState[id];
     const label=skillLabels[id]||display;
     const opts=A.map(([k])=>`<option value="${k}" ${st.attr===k?'selected':''}>${SHORT[k]}</option>`).join("");
+    const armMark=ARMOR_SKILLS.has(id)?'<span class="arm" title="sofre penalidade de armadura">⛨</span>':'';
     return `<div class="sk" data-sk="${id}" data-g="${g}">
       <input type="checkbox" ${st.trained?'checked':''} title="treinada">
-      <div class="nm"><span>${esc(label)}</span>${g?'<span class="g">G</span>':''}
+      <div class="nm"><span>${esc(label)}</span>${g?'<span class="g">G</span>':''}${armMark}
         <span class="om"><select data-k="attr">${opts}</select><input data-k="outros" value="${st.outros}" title="outros"></span></div>
       <div class="tot">+0</div></div>`;}).join("");
   $$("#skills .sk").forEach(skTotal);
@@ -374,13 +385,16 @@ function skTotal(el){
   const totEl=el.querySelector(".tot");
   if(g&&!st.trained){totEl.textContent="—";totEl.classList.add("na");el.classList.remove("tr");return;}
   totEl.classList.remove("na");
-  const t=Math.floor(level/2)+mod(attrs[st.attr])+(st.trained?trainBonus(level):0)+(parseInt(st.outros)||0);
+  const pen=ARMOR_SKILLS.has(id)?armorPen():0;   // penalidade de armadura automática
+  const t=Math.floor(level/2)+mod(attrs[st.attr])+(st.trained?trainBonus(level):0)+(parseInt(st.outros)||0)+pen;
   totEl.textContent=fmt(t); el.classList.toggle("tr",st.trained);
 }
 function recalcDerived(){
   const des=mod(attrs.DES); $("#defDes").textContent=des;
-  const arm=num($('[data-f="defArm"]').value),esc2=num($('[data-f="defEsc"]').value),out=num($('[data-f="defOut"]').value);
-  $("#defTotal").textContent=10+des+arm+esc2+out;
+  const armEsc=armorDef(), out=num($('[data-f="defOut"]').value);
+  if($("#defArmEsc"))$("#defArmEsc").textContent=armEsc;
+  $("#defTotal").textContent=10+des+armEsc+out;
+  if($("#penTotal"))$("#penTotal").textContent=armorPen();
   // carga (se em branco/derivada, sempre recalcula a partir de For)
   $('[data-f="cargamax"]').value=attrs.FOR*3;
   $('[data-f="levantar"]').value=attrs.FOR*10;
@@ -423,13 +437,14 @@ function applyDict(dict){
   // vitais
   setF("pvmax",g("PVs Totais")); setF("pvatual",g("PVs Atuais"));
   setF("pmmax",g("PMs Totais")); setF("pmatual",g("PMs Atuais"));
-  // defesa
-  setF("defArm",num(g("B.Arm"))); setF("defEsc",num(g("B.Esc"))); setF("defOut",num(g("Outros B.CA")));
+  // defesa (armadura/escudo vão para a tabela; "outros" fica no campo out)
+  setF("defOut",num(g("Outros B.CA")));
+  setF("armaduraDef",num(g("B.Arm"))); setF("escudoDef",num(g("B.Esc")));
   // diversos
   setF("prof",g("Proficiências")); setF("tamanho",g("SeleTamanho")); setF("desloc",g("Desloc")); setF("xp",g("Exp"));
   setF("ts",g("T")); setF("to",g("TO")); setF("cargaatual",g("CargaTotal"));
-  // armadura & escudo
-  setF("armaduraNome",g("Armadura")); setF("armaduraPen",g("Pa")); setF("escudoNome",g("Escudo")); setF("escudoPen",g("Pe"));
+  // armadura & escudo (só nome; penalidade não é importada — valores do PDF variam/são pouco confiáveis; preencha na tabela se precisar)
+  setF("armaduraNome",g("Armadura")); setF("escudoNome",g("Escudo"));
   // textos
   setF("descricao",g("Descrição")); setF("habRaca",g("HabRaçasOrigem")); setF("habClasse",g("HabClassePoderes"));
   setF("magias",g("Magias")); setF("notas",g("Anotações"));
@@ -502,10 +517,18 @@ document.addEventListener('input',e=>{const t=e.target;
   if(t.closest("[data-eq]")){const i=+t.closest("[data-eq]").dataset.eq;equip[i][+t.dataset.k]=t.value;saveState();return;}
   if(t.dataset.f){
     if(t.dataset.f==="nivel"){level=num(t.value)||1;$$("#skills .sk").forEach(skTotal);recalcDerived();}
-    if(["defArm","defEsc","defOut"].includes(t.dataset.f))recalcDerived();
+    if(t.dataset.f==="defOut"||t.dataset.f.indexOf("armadura")===0||t.dataset.f.indexOf("escudo")===0){$$("#skills .sk").forEach(skTotal);recalcDerived();}
     if(["personagem","raca","classe","nivel"].includes(t.dataset.f))syncTitle();
     saveState();
   }
+});
+/* botões +/- de PV e PM */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-step]'); if(!b)return;
+  const inp=$(`[data-f="${b.dataset.step}"]`); if(!inp)return;
+  let v=(parseInt(inp.value)||0)+(parseInt(b.dataset.d)||0);
+  if(b.dataset.step==="pmatual"&&v<0)v=0;   // PM não fica negativo
+  inp.value=v; saveState();
 });
 document.addEventListener('change',e=>{if(e.target.closest(".sk")){const el=e.target.closest(".sk"),id=el.dataset.sk;
   if(e.target.type==="checkbox")skillState[id].trained=e.target.checked;
