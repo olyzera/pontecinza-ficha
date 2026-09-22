@@ -134,6 +134,9 @@ table{width:100%;border-collapse:collapse}
 .stepper button{width:28px;height:32px;border:1px solid var(--line);background:var(--raised);color:var(--ink);border-radius:8px;font-size:1.15rem;line-height:1;cursor:pointer;flex:0 0 auto;font-weight:700}
 .stepper button:hover{border-color:var(--ember);color:var(--ember)}
 .stepper input{flex:1;min-width:0}
+@keyframes pcflash{from{background:color-mix(in srgb,var(--ember) 40%,var(--raised))}to{background:var(--raised)}}
+.stepper input.flash{animation:pcflash .45s ease}
+@media(prefers-reduced-motion:reduce){.stepper input.flash{animation:none}}
 .armnote{font-size:.72rem;color:var(--muted);margin-top:8px}
 .armnote b{color:var(--ink)}
 .equip{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -528,7 +531,9 @@ document.addEventListener('click',e=>{
   const inp=$(`[data-f="${b.dataset.step}"]`); if(!inp)return;
   let v=(parseInt(inp.value)||0)+(parseInt(b.dataset.d)||0);
   if(b.dataset.step==="pmatual"&&v<0)v=0;   // PM não fica negativo
-  inp.value=v; saveState();
+  inp.value=v;
+  inp.classList.remove('flash'); void inp.offsetWidth; inp.classList.add('flash'); // pisca pra confirmar
+  saveState();
 });
 document.addEventListener('change',e=>{if(e.target.closest(".sk")){const el=e.target.closest(".sk"),id=el.dataset.sk;
   if(e.target.type==="checkbox")skillState[id].trained=e.target.checked;
